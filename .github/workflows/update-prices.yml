@@ -1,0 +1,111 @@
+name: update-prices
+
+# 株価データ(prices.json)を Yahoo Finance から取得してリポジトリに保存する。
+# GitHub Pages は静的ファイルしか置けないので、サーバー側処理の代わりにこれが毎日走る。
+#
+# 起動タイミング:
+#   - schedule: 毎日 UTC 22:00 = 日本時間 朝7:00
+#   - push:     ファイルをアップロードしたとき(初回セットアップ直後に即実行される)
+#   - workflow_dispatch: Actionsタブから手動で「Run workflow」できる
+
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch prices from Yahoo Finance
+        run: |
+          cat > fetch.mjs <<'EOF'
+          import { writeFileSync } from "node:fs";
+
+          // キーはアプリ側の stooq 値、値は Yahoo Finance のシンボル(日本株は .T 付き)
+          // 銘柄を入れ替えたら index.html の stooq と合わせてここも必ず直すこと
+          const SYMBOLS = {
+            "pgy.us":  "PGY",
+            "grnd.us": "GRND",
+            "clbt.us": "CLBT",
+            "apld.us": "APLD",
+            "geni.us": "GENI",
+            "215a.jp": "215A.T",
+            "247a.jp": "247A.T",
+            "9166.jp": "9166.T",
+            "4375.jp": "4375.T",
+            "3923.jp": "3923.T"
+          };
+
+          async function getQuote(ySym) {
+            const url = "https://query1.finance.yahoo.com/v8/finance/chart/" +
+              encodeURIComponent(ySym) + "?interval=1wk&range=1y";
+            const res = await fetch(url, { headers: { "user-agent": "Mozilla/5.0" } });
+            if (!res.ok) throw new Error(ySym + " HTTP " + res.status);
+            const j = await res.json();
+            const r = j?.chart?.result?.[0];
+            const p = r?.meta?.regularMarketPrice;
+            if (typeof p !== "number") throw new Error(ySym + " no price");
+            const closes = (r?.indicators?.adjclose?.[0]?.adjclose ||
+                            r?.indicators?.quote?.[0]?.close || [])
+              .filter(v => typeof v === "number");
+            return { price: p, hist: closes };
+          }
+
+          const prices = {};
+          const history = {};
+          const failed = [];
+
+          for (const [key, ySym] of Object.entries(SYMBOLS)) {
+            try {
+              const q = await getQuote(ySym);
+              prices[key] = q.price;
+              history[key] = q.hist;
+              console.log("OK   " + key + " = " + q.price + " (" + q.hist.length + "週)");
+            } catch (e) {
+              failed.push(key);
+              console.log("FAIL " + key + ": " + e.message);
+            }
+            await new Promise(r => setTimeout(r, 700)); // Yahooへの連続アクセスを避ける
+          }
+
+          // 全滅した場合は既存の prices.json を壊さないよう異常終了する
+          if (Object.keys(prices).length === 0) {
+            console.error("すべての銘柄で取得に失敗したため prices.json を更新しません");
+            process.exit(1);
+          }
+
+          writeFileSync("prices.json", JSON.stringify({
+            updated: new Date().toISOString(),
+            failed,
+            prices,
+            history
+          }, null, 1));
+          console.log("wrote prices.json (" + Object.keys(prices).length + "/10銘柄)");
+          EOF
+          node fetch.mjs
+          rm fetch.mjs
+
+      - name: Commit prices.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add prices.json
+          # 中身が変わっていない日は何もしない(空コミットを作らない)
+          if git diff --staged --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "株価データ更新 $(date -u +'%Y-%m-%d')"
+            git push
+          fi
