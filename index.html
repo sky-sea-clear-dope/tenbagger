@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>テンバガー候補株ランキング 2026</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1420">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="10倍株">
+<style>
+  :root{
+    --bg:#0f1420; --card:#1a2233; --card2:#202b42; --text:#e8edf5; --sub:#9aa7bd;
+    --us:#4f8ef7; --jp:#e85d75; --gold:#f5c451; --green:#3ecf8e; --red:#ff6b6b;
+    --border:#2b3650;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:"Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px 60px;}
+  .wrap{max-width:860px;margin:0 auto;}
+  h1{font-size:1.5rem;text-align:center;margin-bottom:4px;}
+  .updated{text-align:center;color:var(--sub);font-size:.8rem;margin-bottom:6px;}
+  .live{text-align:center;font-size:.75rem;margin-bottom:16px;color:var(--sub);}
+  .live .on{color:var(--green);font-weight:700;}
+  .tabs{display:flex;gap:10px;margin-bottom:18px;}
+  .tab{flex:1;padding:14px;border-radius:12px;border:2px solid var(--border);background:var(--card);color:var(--sub);font-size:1.05rem;font-weight:700;cursor:pointer;transition:.2s;}
+  .tab.us.active{border-color:var(--us);color:#fff;background:linear-gradient(135deg,#1c2b4d,#16203a);}
+  .tab.jp.active{border-color:var(--jp);color:#fff;background:linear-gradient(135deg,#41202c,#2a1620);}
+  .cond{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:.85rem;color:var(--sub);margin-bottom:18px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;}
+  .head{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer;flex-wrap:wrap;}
+  .rank{font-size:1.6rem;font-weight:800;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--card2);color:var(--sub);}
+  .rank.r1{background:linear-gradient(135deg,#f5c451,#e09c1f);color:#1a1408;}
+  .rank.r2{background:linear-gradient(135deg,#cfd8e3,#9aa7bd);color:#161b24;}
+  .rank.r3{background:linear-gradient(135deg,#d9a06b,#b06f35);color:#241509;}
+  .tinfo{flex:1;min-width:0;}
+  .tname{font-weight:700;font-size:1.05rem;}
+  .ticker{color:var(--sub);font-size:.8rem;}
+  .price{text-align:right;flex-shrink:0;}
+  .price .p{font-weight:800;font-size:1.1rem;}
+  .price .s{font-size:.72rem;color:var(--sub);}
+  .price .warn{font-size:.7rem;color:var(--red);font-weight:700;}
+  .scorebadge{flex-shrink:0;text-align:center;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:6px 10px;min-width:64px;}
+  .scorebadge .n{font-size:1.25rem;font-weight:800;}
+  .scorebadge .l{font-size:.62rem;color:var(--sub);}
+  .sc-hi{color:var(--gold);} .sc-mid{color:var(--green);} .sc-low{color:var(--sub);}
+  .arrow{color:var(--sub);transition:.25s;flex-shrink:0;}
+  .card.open .arrow{transform:rotate(180deg);}
+  .body{display:none;padding:0 16px 16px;border-top:1px solid var(--border);}
+  .card.open .body{display:block;}
+  .sec{margin-top:14px;}
+  .sec h4{font-size:.85rem;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .sec h4 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+  .sec p,.sec li{font-size:.88rem;line-height:1.7;color:#cdd6e4;}
+  .sec ul{padding-left:1.2em;}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .tag{font-size:.72rem;padding:3px 10px;border-radius:20px;background:var(--card2);color:var(--sub);border:1px solid var(--border);}
+  .risk{color:var(--red);}
+  .tenx{background:#20240f;border:1px solid #4a5d1e;border-radius:10px;padding:10px 12px;}
+  .gbar{height:14px;background:var(--card2);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+  .gfill{height:100%;border-radius:7px;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .6s;}
+  .glabel{font-size:.75rem;color:var(--sub);margin-top:4px;}
+  .glabel b{color:var(--gold);}
+  .spark{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px;font-size:.75rem;color:var(--sub);text-align:center;}
+  .spark svg{display:block;width:100%;height:44px;}
+  .bars{margin-top:10px;}
+  .bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:.75rem;}
+  .bar .bl{width:9em;color:var(--sub);flex-shrink:0;}
+  .bar .bt{flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden;}
+  .bar .bf{height:100%;border-radius:4px;}
+  .bar .bv{width:3.5em;text-align:right;color:var(--text);font-weight:700;}
+  .disclaimer{margin-top:26px;background:#241d12;border:1px solid #5d4a1e;border-radius:10px;padding:14px;font-size:.78rem;color:#d8c9a3;line-height:1.7;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  /* スマホ表示調整: 銘柄名が縦書きに潰れるのを防ぐ */
+  @media (max-width:520px){
+    .head{gap:10px 12px;padding:14px;}
+    .rank{width:40px;height:40px;font-size:1.35rem;}
+    .tinfo{flex:1 1 auto;min-width:calc(100% - 52px);}
+    .tname{font-size:1rem;}
+    .price{flex:1 1 auto;text-align:left;margin-left:52px;}
+    .scorebadge{min-width:56px;padding:5px 8px;}
+    .bar .bl{width:7.5em;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚀 テンバガー候補株ランキング</h1>
+  <div class="updated">再分析日: 2026年8月3日（株価基準日 2026年7月5日）｜ 株価10倍の可能性 × 決算実績 × 定量スコアで厳選</div>
+  <div class="live">
+    <button id="refreshBtn" onclick="refreshPrices()" style="background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:700;cursor:pointer;">🔄 最新株価に更新</button>
+    <div id="liveStatus" style="margin-top:6px;">株価: 基準日(2026/7/5)のデータを表示中</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab us active" onclick="show('us',this)">🇺🇸 米国株</button>
+    <button class="tab jp" onclick="show('jp',this)">🇯🇵 日本株</button>
+  </div>
+
+  <div id="us" class="panel active">
+    <div class="cond">選定条件: 1株 <b>50ドル以下</b> ／ 時価総額 <b>100億ドル以下</b>（10倍の余地を残す規模）／ <b>黒字または黒字目前のみ</b>（赤字先行型は除外）／ 10年で株価10倍のシナリオが具体的に描ける銘柄だけを厳選。<b>総合スコア</b>は 成長性30＋収益性20＋割安度20＋トレンド15＋財務15＝100点満点。<b>割安度</b>はPER・PSR・PEG（成長率対比）の数式ルールで算出し、毎月の再分析でスコアと前回比を更新。</div>
+    <div id="us-list"></div>
+  </div>
+
+  <div id="jp" class="panel">
+    <div class="cond">選定条件: 1株 <b>2,000円以下</b> ／ 時価総額 <b>5,000億円以下</b>（10倍の余地を残す規模）／ <b>黒字または黒字目前のみ</b>（赤字先行型は除外）／ 10年で株価10倍のシナリオが具体的に描ける銘柄だけを厳選。<b>総合スコア</b>は 成長性30＋収益性20＋割安度20＋トレンド15＋財務15＝100点満点。<b>割安度</b>はPER・PSR・PEG（成長率対比）の数式ルールで算出し、毎月の再分析でスコアと前回比を更新。</div>
+    <div id="jp-list"></div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ <b>免責事項</b>: 本アプリは2026年8月3日時点の公開情報（決算資料・市場データ・ニュース）に基づく情報提供であり、投資勧誘ではありません。「10倍シナリオ」は条件が揃った場合の可能性を示すもので、実現を保証するものでは一切ありません。小型成長株は値動きが激しく、株価が半分以下になるリスクも常にあります。最新株価は外部データ（Yahoo Finance）を取得しており、遅延・欠損の可能性があります。投資判断はご自身の責任で、余裕資金の範囲でお願いします（クロちゃんは金融アドバイザーではありません）。
+  </div>
+</div>
+
+<script>
+// スコア: [成長性/30, 収益性/20, 割安度/20, トレンド/15, 財務/15]
+const usStocks = [
+ {
+  rank:1, name:"Pagaya Technologies（パガヤ）", ticker:"NASDAQ: PGY", price:"約 $19.3",
+  stooq:"pgy.us", limit:50, cur:"usd", base:17.79, edate:"2026-11-05", elabel:"2026年11月上旬（予定）", prev:74,
+  score:[25,17,17,12,12],
+  sector:["AI与信","フィンテック","小型株"],
+  summary:"銀行やローン会社に「AI審査エンジン」を提供する裏方企業。GAAP黒字を積み上げ、今回の再分析で総合1位に浮上した。",
+  results:["2026年Q2（7/30発表）: 総収益3.87億ドル（前年比+19%）、GAAP純利益4,500万ドル（前年同期比+2,900万ドル）","通期のGAAP純利益ガイダンスを1.55億〜1.80億ドルへ上方修正（従来は1.1〜1.6億ドル）","調整後EBITDA 1.24億ドル（+43%）、ネットワーク取扱高35億ドル（+33%）と主要指標がそろって加速","時価総額は約16億ドルと小さく、10銘柄のなかでCLBTと並ぶ数少ない「明確なGAAP黒字」銘柄"],
+  trend:"米国の銀行は自前のAI与信開発が難しく、外部エンジンを組み込む流れが加速。Pagayaは審査に落ちた申込者を「二次審査」で拾うモデルのため、銀行側は導入するだけ収益が増える構造でスイッチングコストも高い。直近は自動車ローン分野の伸びが全体を牽引しており、個人ローン一本足からの脱却が進んでいる。",
+  tenx:"時価総額は約16億ドル。10倍なら160億ドル。①純利益が年1.7億ドル→5億ドルへ成長、②高成長フィンテックとしてPER30倍前後の評価——この2つだけで160億ドル圏に届く計算で、10銘柄のなかで最も算数がシンプル。③自動車ローン・POS分割払いの本格拡大と大手銀行の追加提携が加われば上振れる。すでに黒字なので「潰れにくい小型株」である点が宝くじ系銘柄との違い。",
+  risks:"景気後退でローンの貸倒れが増えると収益が直撃される（信用サイクルに敏感）。資金調達をABS市場に依存。過去に株式希薄化で株価が大きく下げた歴史もある。株価は7月5日比で+8%と上昇しており、割安度の余地は少しずつ縮んでいる。"
+ },
+ {
+  rank:2, name:"Grindr（グラインダー）", ticker:"NYSE: GRND", price:"約 $17.3",
+  stooq:"grnd.us", limit:50, cur:"usd", base:17.34, edate:"2026-08-06", elabel:"2026年8月6日（予定）", prev:null,
+  score:[24,17,11,12,11],
+  sector:["アプリ","サブスク","高収益"],
+  summary:"世界最大のLGBTQ+向けマッチングアプリ。有料課金と広告で稼ぐ、利益率が突出して高い一本足のプラットフォーム。今回HIMSと入れ替えで新規採用。",
+  results:["2026年Q1（5/7発表）: 売上1.30億ドル（前年比+38%）、GAAP純利益2,675万ドル（純利益率21%）","調整後EBITDAマージンは45%と、上場アプリ企業のなかでも最高水準","通期売上ガイダンスを5.35億ドル以上へ上方修正","時価総額は約31億ドル。高成長と明確なGAAP黒字を両立している点が、赤字転落したHIMSとの入れ替え理由"],
+  trend:"デーティングアプリ全体が伸び悩むなかで、Grindrは特定コミュニティにおいて事実上の独占ポジションを維持している。ユーザーが増えてもサーバー費用しか増えない構造のため、売上の伸びがほぼそのまま利益になる。AI機能による有料プランの強化と、立ち上がり始めた広告事業が1人あたり単価を押し上げている。",
+  tenx:"時価総額は約31億ドル。10倍なら310億ドル。①売上5.35億ドルが年25%成長で7年後に約25億ドル、②純利益率25%で純利益6億ドル超、③高収益アプリとしてPER40〜50倍——が揃えば300億ドル圏。売上5倍×利益率改善×評価倍率という三段構えで、数字としては素直に積み上がる。",
+  risks:"アプリ1本に依存する事業構造が最大のリスク。AppleとGoogleのアプリストア手数料・規約変更の影響を直接受ける。中国系オーナーからの買収経緯に伴う政治的な監視も続いている。すでにPER38倍前後まで買われており、8月6日のQ2決算で成長が鈍れば下落幅は大きい。"
+ },
+ {
+  rank:3, name:"Cellebrite（セレブライト）", ticker:"NASDAQ: CLBT", price:"約 $14.8",
+  stooq:"clbt.us", limit:50, cur:"usd", base:15.65, edate:"2026-08-13", elabel:"2026年8月13日（予定）", prev:70,
+  score:[19,16,12,12,13],
+  sector:["デジタル捜査","政府向けSaaS","イスラエル発"],
+  summary:"警察・捜査機関がスマホから証拠を抽出するソフトの世界標準。政府向けの解約されにくいSaaSで着実に成長する「守りのテンバガー候補」。",
+  results:["2026年Q1（5/14発表）: 売上1.28億ドル（+19%）、ARR 4.93億ドル（+21%）、GAAP希薄化後EPS $0.04で黒字を維持","調整後EBITDA 3,060万ドル（+29%、マージン24%）、GAAP粗利率82.5%と収益性が高い","通期ガイダンスは売上5.65〜5.71億ドル、ARR 5.67〜5.73億ドル","2026年6月にAI主導の統合捜査プラットフォームへの戦略転換を発表。元Okta/Auth0社長のShiven Ramji氏が製品・技術責任者に就任"],
+  trend:"犯罪の証拠はほぼすべてスマホとクラウドの中にあり、捜査のデジタル化は世界的に不可逆。各国の治安・防衛予算は拡大傾向で、政府支出に支えられた需要は景気に左右されにくい。競合が少なく、事実上の業界標準ツールとなっている。",
+  tenx:"時価総額約37億ドル。10倍には①捜査ワークフロー全体（抽出→解析→報告）をAIスイートで押さえてARRを数倍化、②民間企業の不正調査市場への本格展開、③SaaS優良株としての評価替え——の3段が必要。成長率が突出しているわけではないため時間はかかるが、実質無借金・キャッシュリッチで下値が堅い「負けにくい」タイプの候補。",
+  risks:"監視技術への人権面の批判・輸出規制リスク、政府予算の削減、成長率が鈍化した場合のSaaS評価切り下げ。8月13日のQ2決算が直近の関門。"
+ },
+ {
+  rank:4, name:"Applied Digital（アプライド・デジタル）", ticker:"NASDAQ: APLD", price:"約 $27.4",
+  stooq:"apld.us", limit:50, cur:"usd", base:33.06, edate:"2026-10-14", elabel:"2026年10月14日（予定）", prev:78,
+  score:[29,7,10,15,9],
+  sector:["AIデータセンター","AI電力","ハイリスク・ハイリターン"],
+  summary:"AI専用データセンターを建設して大手AI企業に貸すインフラ屋。成長率は圧倒的だが、今回の再分析では債務急増とGAAP赤字で財務スコアを大きく下げた。",
+  results:["2026年5月期通期（7/27発表）: 売上6.11億ドル（+167%）。ただしQ4売上2.59億ドルのうち1.52億ドルは一過性の内装工事収益で、実力値は割り引いて見る必要あり","GAAP純損失は2.49億ドル。調整後純利益は3,610万ドルで、黒字化は2027年度計画のまま","契約済みリース残高は5キャンパス・1,410MWで362億ドル規模（take-or-pay契約）と、売上の先は見えている","2026年6月に15.9億ドルのシニア担保付社債（利率7.0%・2031年満期）を発行し、債務が急増。6/12〜7/13で株価は約32%下落した"],
+  trend:"生成AIの計算需要は電力とデータセンターの確保競争に直結。米国では「電力を確保した者が勝つ」状況で、Applied Digitalはノースダコタ等の安価な電力地帯に大規模用地と電力枠を先に押さえた。AIインフラ投資は2030年まで拡大が続く見通しで、追い風の強さは10銘柄でNo.1。",
+  tenx:"契約済みリース収入362億ドルがそのまま売上化すれば、売上規模は現在の10倍以上になる計算。①建設中の施設が予定通り稼働、②2027年度の黒字化を達成、③追加の大型契約獲得——が揃えば、データセンターREIT級の評価替えで株価10倍シナリオが成立する。時価総額は約78億ドルで、株価$35を超えると100億ドルの選定上限に抵触する点も要注意。",
+  risks:"10銘柄で最もハイリスク。社債15.9億ドルの発行で利払い負担が重くなり、建設遅延・追加増資による希薄化・CoreWeaveなど少数顧客への依存が三大リスク。GAAP赤字は2.49億ドルまで拡大しており、AI投資ブームが冷めた場合の下落幅も最大級。"
+ },
+ {
+  rank:5, name:"Genius Sports（ジーニアス・スポーツ）", ticker:"NYSE: GENI", price:"約 $6.9",
+  stooq:"geni.us", limit:50, cur:"usd", base:6.43, edate:"2026-08-06", elabel:"2026年8月6日（予定）", prev:66,
+  score:[22,9,10,13,9],
+  sector:["スポーツデータ","ベッティング","小型株"],
+  summary:"NFLなどの公式試合データを独占的にブックメーカーへ配信する「スポーツベッティングの水道管」。売上は伸びているが、買収による希薄化と赤字拡大でスコアを下げた。",
+  results:["2026年Q1（5/7発表）: 売上1.88億ドル（+31%）、調整後EBITDA 2,400万ドル（+21%）","通期ガイダンスを上方修正（グループ売上9.9〜10.1億ドル、調整後EBITDA 2.7〜2.8億ドル）","一方でGAAP純損失は5,550万ドルへ拡大（為替・株式報酬・買収の一時費用）","2026年5月にデジタルスポーツメディアのLegendを最大12億ドルで買収完了。株式数が2.39億株→2.68億株に増え、時価総額は約19億ドルへ"],
+  trend:"米国のスポーツベッティング合法化は州ごとに進行中で、市場はまだ拡大の途中。試合中に賭けるライブベッティングはリアルタイムデータが必須で、公式データを持つGeniusの価値は年々上昇。2026年6月にはLIGA MXと予測市場Polymarketの提携で公式データ・インテグリティサービスを担当するなど、新領域も広がっている。",
+  tenx:"時価総額約19億ドル。10倍なら190億ドル。①合法化州の拡大で市場全体が数倍、②ライブベッティング比率の上昇でデータ単価が上昇、③GAAP黒字化の定着でマルチプル評価替え——が揃えば到達圏。ただしLegend買収で株式数が12%増えており、1株あたりで10倍にするハードルは7月時点より上がった。",
+  risks:"NFL等との契約更新時のコスト上昇（株式で支払う契約のため希薄化も）、ベッティング規制の揺り戻し、GAAP赤字が縮小せず拡大している点。8月6日のQ2決算が直近の関門。"
+ }
+];
+
+const jpStocks = [
+ {
+  rank:1, name:"タイミー", ticker:"東証グロース 215A", price:"約 1,466円",
+  stooq:"215a.jp", limit:2000, cur:"jpy", base:1682, edate:"2026-09-11", elabel:"2026年9月中旬（予定）", prev:82,
+  score:[24,15,13,14,13],
+  sector:["スキマバイト","人手不足","プラットフォーム"],
+  summary:"「働きたい時間に働く」スキマバイト市場の圧倒的首位。日本の人手不足という最大の構造問題を収益化する高収益プラットフォーム。",
+  results:["2026年4月期（決算期変更に伴う2025年11月〜2026年4月の6ヶ月変則決算・6/11発表）: 売上210.6億円、営業利益38.1億円、純利益24.4億円","2027年4月期計画: 売上476〜488億円、営業利益88.2〜97.5億円と高い利益成長を継続","ただし2〜4月期の経常利益は前年同期比8.3%減、売上営業利益率も23.7%→16.8%へ低下し、成長投資局面に入った","2026年8月から「長期アルバイト採用サポートプラン」（月額2万円〜）を本格展開し、スキマバイトから長期採用支援へ領域を拡大。時価総額は約1,477億円"],
+  trend:"日本の労働人口は今後も減り続けることが確定しており、「必要な時間だけ人を借りる」スポットワークは物流・飲食・小売で標準の採用手段になりつつある。正社員・派遣に比べスポットワーク市場はまだ小さく、伸びしろが大きい。先行者としてワーカーデータ（勤怠実績・評価）を最も多く持つのがタイミー。",
+  tenx:"時価総額は約1,477億円。10倍の1.5兆円はリクルートの10分の1以下であり、人材業界の規模から見て非現実的な数字ではない。①スポットワークが採用市場の主要チャネルに昇格、②蓄積した勤怠データを使った正社員紹介・長期採用支援など高単価事業への展開、③物流・介護など大口業界の深耕——が揃えば売上・利益とも10倍が描ける。国内テンバガー候補の本命は継続。",
+  risks:"リクルート等の大手参入による手数料競争、スポットワーク関連の規制強化（労働法制）。直近は先行投資で利益率が明確に低下しており、この投資が売上として返ってくるかが2027年4月期の焦点。成長期待が高いぶん決算ミス時の下落も大きい。"
+ },
+ {
+  rank:2, name:"Aiロボティクス", ticker:"東証グロース 247A", price:"約 862円",
+  stooq:"247a.jp", limit:2000, cur:"jpy", base:862, edate:"2026-08-14", elabel:"2026年8月14日（予定）", prev:null,
+  score:[27,15,14,11,11],
+  sector:["AI×D2C","美容家電","ファブレス"],
+  summary:"自社開発AI「SELL」で商品企画から在庫・広告までを回すD2C企業。美容家電『ブライト』やスキンケア『ユンス』を工場を持たずに展開し、売上が1年で2倍になった。今回カバーと入れ替えで新規採用。",
+  results:["2026年3月期（5/13発表）: 売上293.6億円（前期比+106.7%）、営業利益38.0億円（+53.3%）、純利益26.5億円（+55.9%）","2027年3月期計画: 売上560〜600億円（+90.7〜104.4%）、営業利益75〜100億円と再び倍増を計画","2026年4月にBJCを完全子会社化。M&Aで販路を広げ、自社AIを横展開する成長モデル","時価総額は約560億円、PER約20倍。増収率+106.7%に対して評価は控えめで、日本株5銘柄で成長率は断トツ"],
+  trend:"SNSの短尺動画広告とECが直結し、「広告で当てて即量産」のサイクルが商品開発の主流になった。Aiロボティクスは企画・広告・在庫の判断を自社AIに任せることでこのサイクルを他社より速く回し、工場を持たないため利益率も高い。国内D2C市場はまだ細かく分散しており、ブランドを束ねる側に回れる余地が大きい。",
+  tenx:"時価総額は約560億円。10倍なら5,600億円。①ブランドの横展開と海外販売で売上600億円→1,500億円、②営業利益率17%で営業利益255億円、③高成長企業としてPER30倍前後の評価——が揃えば5,000億円台が視野に入る。既存銘柄と業種が完全に重ならず、分散の意味でも入れ替え効果が大きい。",
+  risks:"主力ブランドへの依存度が高く、ヒット商品が入れ替わると業績が振れやすい。2026年3月期は会社計画に対して利益が未達だった点、広告費の高騰、BJC買収の統合リスク、創業経営者への依存も注意。8月14日の1Q決算で倍増計画の初動が確認できるかが最初の関門。"
+ },
+ {
+  rank:3, name:"GENDA（ジェンダ）", ticker:"東証グロース 9166", price:"約 602円",
+  stooq:"9166.jp", limit:2000, cur:"jpy", base:566, edate:"2026-09-14", elabel:"2026年9月中旬（予定）", prev:76,
+  score:[26,11,13,13,10],
+  sector:["エンタメ","M&Aロールアップ","GiGO"],
+  summary:"ゲームセンター「GiGO」を核に、カラオケ・映画・フードなどエンタメ企業を次々買収して拡大する「エンタメの連続買収企業」。",
+  results:["2027年1月期1Q（2〜4月・6/10発表）: 売上497.0億円（前年同期比+45.0%）、調整後EBITDA 46.1億円（+8.0%）","一方で調整後当期純利益は7.4億円（▲46.5%）、日本基準ではのれん償却が重く7.5億円の最終赤字。増収率は高いが利益面は明確に鈍化","2027年1月期通期計画は売上2,150億円（+25.8%）、調整後EBITDA 300億円（+31.3%）、調整後純利益106億円（+12.7%）。2026年3月に上方修正済みで、未確定のM&Aは含まない","2026年7月29日にSBIホールディングスと資本業務提携。SBIが市場買付でGENDA株を最大1.00%取得し、GENDAはSBIのコンテンツ投資ファンドに3億円出資"],
+  trend:"国内エンタメ産業は後継者不足・再編期にあり、優良な買収対象が豊富。円安によるインバウンド消費（プライズ・アミューズメント）も追い風。米国のロールアップ企業（買収で複利成長する企業）は長期で市場平均を大きく上回った歴史があり、GENDAはその日本版を狙う。SBIとの提携は今後のM&A資金と案件供給の両面で効いてくる可能性がある。",
+  tenx:"時価総額は約1,063億円と小さく、ロールアップ戦略が機能し続ければEPS（1株利益）は複利で伸びる。①年数件ペースのM&A継続、②買収先の利益率改善、③「日本版エンタメ集団」としての市場評価確立——で、EPS成長×評価倍率上昇のダブルで10倍を狙う設計図が会社側にすでにある。経営陣が10倍を公言している珍しい銘柄。",
+  risks:"買収失敗・のれん減損リスクが最大。1Qでは北米事業の通期見通しを下方修正しており、海外展開はまだ不安定。買収資金調達による希薄化・借入増、金利上昇はロールアップ戦略の逆風。祖業のゲームセンター市場自体は成熟市場。"
+ },
+ {
+  rank:4, name:"セーフィー", ticker:"東証グロース 4375", price:"約 663円",
+  stooq:"4375.jp", limit:2000, cur:"jpy", base:672, edate:"2026-08-13", elabel:"2026年8月中旬（予定）", prev:70,
+  score:[23,12,12,13,12],
+  sector:["クラウドカメラ","映像AI","現場DX"],
+  summary:"クラウド録画カメラで国内シェア首位。防犯カメラを「現場のデータ基盤」に変える映像×AIのSaaS企業。四半期ベースで初の黒字を達成し離陸フェーズへ。",
+  results:["2026年12月期1Q（5/15発表）: 売上51.1億円（前年同期比+20.9%）、四半期として初の経常黒字・最終黒字を達成","ARR（年間経常収益）は150.0億円（+21.5%）、課金カメラ37.0万台（+20.9%）とストックが着実に積み上がる","通期計画は据え置き（売上232.2億円 +22.0%、売上総利益118.3億円 +24.5%、調整後営業利益4.5〜6.5億円）","時価総額は約370億円で、日本株5銘柄のなかで最小。値動きは荒いが上昇余地も大きい"],
+  trend:"防犯カメラのクラウド化率は国内でまだ1割未満とされ、置き換え余地が巨大。人手不足で「現場を映像で遠隔管理する」需要が建設・小売・飲食で拡大中。単なる録画から、AIによる人数カウント・危険検知・業務分析へ用途が広がると、1台あたり単価が上がる二段ロケット構造。",
+  tenx:"時価総額は約370億円と今回の10銘柄で最小クラス。①クラウド化率が1割→5割に進む波を首位として取り込む、②映像AI解析の追加課金で客単価を倍増、③黒字化定着で機関投資家の買いが入る——が揃えば、ARR複利成長×評価替えで10倍圏。小型ゆえ値動きは荒いが、ストック型で下値も読みやすい。",
+  risks:"大手（通信キャリア・海外勢）の参入による競争激化、ハードウェア原価と在庫リスク、成長投資を再加速した場合の利益ブレ。黒字はまだ薄く、1四半期の実績にすぎない点に注意。"
+ },
+ {
+  rank:5, name:"ラクス", ticker:"東証プライム 3923", price:"約 1,060円",
+  stooq:"3923.jp", limit:2000, cur:"jpy", base:1025, edate:"2026-08-14", elabel:"2026年8月14日（予定）", prev:67,
+  score:[21,16,9,10,13],
+  sector:["SaaS","経費精算DX","ストック型収益"],
+  summary:"「楽楽精算」「楽楽明細」の中小企業向けSaaSの王者。派手さはないが、複利で伸び続ける「時間を味方につける」テンバガー候補。",
+  results:["2026年3月期（5/14発表）: 売上602.9億円（前年比+23.3%）、営業利益173.5億円（+70.2%）と大幅増益","2027年3月期計画: 営業利益205億円（約+18%）。ただしIT人材事業（ラクスパートナーズ）は譲渡済みで連結から外れているため、単純比較には注意","ラクスパートナーズを187.7億円で譲渡（2026年4月1日）。1Qに特別利益約167億円を計上予定で、あわせて50億円の自社株買いを実施","時価総額は約3,756億円と日本株5銘柄で最大。5,000億円の選定上限に最も近い"],
+  trend:"インボイス制度・電子帳簿保存法対応と人手不足で、中小企業の経理DXは「やらざるを得ない」構造的需要。日本の中小企業は約380万社あり、バックオフィスSaaSの普及率はまだ数%台。非IT人材でも使える製品設計で、この巨大な未開拓市場の王者ポジションにいる。",
+  tenx:"時価総額は約3,756億円。10倍の3.7兆円には、①楽楽シリーズのクロスセル（精算→明細→販売→勤怠）で1社あたり単価を数倍化、②導入社数を現在の数倍へ、③利益率のさらなる改善——を10年単位で複利で積み上げる必要がある。1年で化けるタイプではなく「10年持って10倍」の長期複利型。過去10年で実際に10倍以上になった実績があるのが最大の説得力。",
+  risks:"時価総額がすでに大きく、10倍のハードルは5銘柄で最も高い。SaaS銘柄は金利上昇局面で評価切り下げを受けやすい。8月14日の1Q決算は特別利益167億円が乗るため純利益が一時的に膨らみ、PERなどの指標が歪む点に注意。"
+ }
+];
+
+const AXES = [["成長性",30],["収益性",20],["割安度",20],["トレンド",15],["財務健全性",15]];
+const total = s => s.score.reduce((a,b)=>a+b,0);
+const scClass = t => t>=80 ? "sc-hi" : t>=65 ? "sc-mid" : "sc-low";
+
+// 前回スコア比（信頼性の定量評価）: prev=null は今回基準での初回分析
+function prevBadge(s, t){
+  if(s.prev == null) return `<span style="color:var(--sub)">初回分析</span>`;
+  const d = t - s.prev;
+  if(d > 0)  return `<span style="color:var(--green)">▲ 前回比 +${d}</span>`;
+  if(d < 0)  return `<span style="color:var(--red)">▼ 前回比 ${d}</span>`;
+  return `<span style="color:var(--sub)">→ 前回比 ±0</span>`;
+}
+
+// 決算接近判定（発表14日前〜3日後は注意表示）
+function earningsSoon(s){
+  if(!s.edate) return false;
+  const diff = (new Date(s.edate) - new Date()) / 86400000;
+  return diff <= 14 && diff >= -3;
+}
+
+function card(s, color){
+  const t = total(s);
+  const bars = s.score.map((v,i)=>{
+    const label = AXES[i][0], max = AXES[i][1];
+    const pct = Math.round(v/max*100);
+    return `<div class="bar"><div class="bl">${label} (${max}点)</div><div class="bt"><div class="bf" style="width:${pct}%;background:${pct>=80?'var(--gold)':pct>=60?'var(--green)':'var(--sub)'}"></div></div><div class="bv">${v}点</div></div>`;
+  }).join("");
+  return `<div class="card">
+    <div class="head" onclick="this.parentElement.classList.toggle('open')">
+      <div class="rank r${s.rank}">${s.rank}</div>
+      <div class="tinfo">
+        <div class="tname">${s.name}</div>
+        <div class="ticker">${s.ticker}</div>
+        <div class="tags">${s.sector.map(x=>`<span class="tag">${x}</span>`).join("")}</div>
+      </div>
+      <div class="scorebadge"><div class="n ${scClass(t)}">${t}</div><div class="l">総合スコア/100</div><div class="l" style="margin-top:2px;">${prevBadge(s,t)}</div></div>
+      <div class="price" id="price-${s.stooq.replace(".","-")}"><div class="p">${s.price}</div><div class="s">基準日株価</div></div>
+      <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="body">
+      <div class="sec"><p style="color:var(--text);font-weight:600;">${s.summary}</p></div>
+      <div class="sec"><p style="font-size:.8rem;color:var(--sub);">📅 次回決算: ${s.elabel}${earningsSoon(s)?` <b style="color:var(--red)">⚠ 決算接近 — 発表前後は値動きが荒れやすいので注意</b>`:""}</p></div>
+      <div class="sec"><h4><span class="dot" style="background:var(--gold)"></span>🎯 10倍進捗ゲージ</h4>
+        <div class="gbar"><div class="gfill" id="gauge-${s.stooq.replace(".","-")}" style="width:10%"></div></div>
+        <div class="glabel" id="glab-${s.stooq.replace(".","-")}">現在 <b>1.00倍</b> ／ 目標 10倍（基準日: ${s.price}）</div></div>
+      <div class="sec"><h4><span class="dot" style="background:${color}"></span>📈 過去1年の株価推移</h4>
+        <div class="spark" id="spark-${s.stooq.replace(".","-")}">「🔄 最新株価に更新」を押すとチャートが表示されます</div></div>
+      <div class="sec"><h4><span class="dot" style="background:${color}"></span>🧮 定量スコア内訳（100点満点）</h4><div class="bars">${bars}</div></div>
+      <div class="sec"><h4><span class="dot" style="background:${color}"></span>📊 決算分析（なぜ強いのか）</h4>
+        <ul>${s.results.map(r=>`<li>${r}</li>`).join("")}</ul></div>
+      <div class="sec"><h4><span class="dot" style="background:var(--green)"></span>🌏 トレンド・商流分析（なぜ今後伸びるのか）</h4>
+        <p>${s.trend}</p></div>
+      <div class="sec"><h4><span class="dot" style="background:var(--gold)"></span>🚀 10倍シナリオ（何がどうなれば10倍か）</h4>
+        <div class="tenx"><p>${s.tenx}</p></div></div>
+      <div class="sec"><h4><span class="dot" style="background:var(--red)"></span>⚠️ リスク（クロちゃんからの注意点）</h4>
+        <p class="risk" style="color:#f0a3a3;">${s.risks}</p></div>
+    </div>
+  </div>`;
+}
+
+document.getElementById("us-list").innerHTML = usStocks.map(s=>card(s,"var(--us)")).join("");
+document.getElementById("jp-list").innerHTML = jpStocks.map(s=>card(s,"var(--jp)")).join("");
+
+function show(id, btn){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  btn.classList.add("active");
+}
+
+// 過去1年の週足終値からミニチャートSVGを生成
+function sparkSVG(arr){
+  const w = 200, h = 40, pad = 2;
+  const mn = Math.min(...arr), mx = Math.max(...arr);
+  const rng = (mx - mn) || 1;
+  const pts = arr.map((v,i)=>{
+    const x = pad + i * (w - pad*2) / (arr.length - 1);
+    const y = h - pad - (v - mn) * (h - pad*2) / rng;
+    return x.toFixed(1) + "," + y.toFixed(1);
+  }).join(" ");
+  const up = arr[arr.length-1] >= arr[0];
+  const col = up ? "var(--green)" : "var(--red)";
+  const chg = ((arr[arr.length-1]/arr[0] - 1) * 100).toFixed(0);
+  return `<svg viewBox="0 0 ${w} ${h+12}" preserveAspectRatio="none">
+    <polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.6"/>
+    <text x="${w-2}" y="${h+10}" text-anchor="end" font-size="8" fill="${col}">1年: ${chg>=0?"+":""}${chg}%</text>
+  </svg>`;
+}
+
+// ===== 最新株価の更新（prices.json を読む / 失敗時は基準日株価のまま） =====
+// prices.json は GitHub Actions が毎日 Yahoo Finance から取得してリポジトリに保存している
+async function refreshPrices(){
+  const st = document.getElementById("liveStatus");
+  const btn = document.getElementById("refreshBtn");
+  btn.disabled = true;
+  btn.textContent = "⏳ 取得中…";
+  st.textContent = "株価: 最新データを取得しています…";
+  try{
+    const res = await fetch("prices.json?t=" + Date.now(), {cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const data = await res.json();
+    const all = usStocks.concat(jpStocks);
+    let updated = 0;
+    for(const s of all){
+      const p = data.prices[s.stooq];
+      if(p == null) continue;
+      const el = document.getElementById("price-"+s.stooq.replace(".","-"));
+      if(!el) continue;
+      const isJp = s.cur === "jpy";
+      const str = isJp ? p.toLocaleString("ja-JP",{maximumFractionDigits:0})+"円" : "$"+p.toFixed(2);
+      const over = p > s.limit;
+      const chg = (p - s.base) / s.base * 100;
+      const cs = (chg >= 0 ? "+" : "") + chg.toFixed(1);
+      const cc = chg >= 0 ? "var(--green)" : "var(--red)";
+      el.innerHTML = `<div class="p">${str}</div><div class="s" style="color:${cc};font-weight:700;">基準日比 ${cs}%</div>${over?`<div class="warn">⚠ 条件(${isJp?"2,000円":"$50"})超過</div>`:""}`;
+      // 10倍進捗ゲージ更新
+      const mult = p / s.base;
+      const g = document.getElementById("gauge-"+s.stooq.replace(".","-"));
+      const gl = document.getElementById("glab-"+s.stooq.replace(".","-"));
+      if(g && gl){
+        g.style.width = Math.max(2, Math.min(100, mult*10)) + "%";
+        gl.innerHTML = `現在 <b>${mult.toFixed(2)}倍</b> ／ 目標 10倍（基準日: ${s.price}）`;
+      }
+      // ミニチャート描画（過去1年・週足）
+      const hist = data.history && data.history[s.stooq];
+      const sp = document.getElementById("spark-"+s.stooq.replace(".","-"));
+      if(sp && hist && hist.length > 2) sp.innerHTML = sparkSVG(hist);
+      updated++;
+    }
+    let ts = "";
+    if(data.updated){
+      const d = new Date(data.updated);
+      if(!isNaN(d)) ts = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}`;
+    }
+    st.innerHTML = updated>0
+      ? `株価: <span class="on">● 更新済み</span>（${updated}/10銘柄・${ts||"日時不明"}時点・出所: Yahoo Finance・1日1回更新）`
+      : "株価: 基準日のデータを表示中（株価データを準備中です。数分後にもう一度お試しください）";
+  }catch(e){
+    st.textContent = "株価: 基準日のデータを表示中（オフライン、または prices.json を読み込めませんでした）";
+  }
+  btn.disabled = false;
+  btn.textContent = "🔄 最新株価に更新";
+}
+
+// PWA: サービスワーカー登録（公開サイトのみ）
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+</script>
+</body>
+</html>
