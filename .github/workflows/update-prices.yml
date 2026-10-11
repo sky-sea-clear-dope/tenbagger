@@ -45,7 +45,8 @@ jobs:
             "247a.jp": "247A.T",
             "9166.jp": "9166.T",
             "4375.jp": "4375.T",
-            "3923.jp": "3923.T"
+            "3923.jp": "3923.T",
+            "pltr.us": "PLTR"
           };
 
           async function getQuote(ySym) {
@@ -92,7 +93,7 @@ jobs:
             prices,
             history
           }, null, 1));
-          console.log("wrote prices.json (" + Object.keys(prices).length + "/10銘柄)");
+          console.log("wrote prices.json (" + Object.keys(prices).length + "/" + Object.keys(SYMBOLS).length + "銘柄)");
           EOF
           node fetch.mjs
           rm fetch.mjs
