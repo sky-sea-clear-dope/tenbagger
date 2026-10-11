@@ -46,7 +46,8 @@ jobs:
             "9166.jp": "9166.T",
             "4375.jp": "4375.T",
             "3923.jp": "3923.T",
-            "pltr.us": "PLTR"
+            "pltr.us": "PLTR",
+            "9519.jp": "9519.T"
           };
 
           async function getQuote(ySym) {
