@@ -441,6 +441,7 @@ const watchStocks = [
  {
   name:"Palantir Technologies（パランティア）", ticker:"NASDAQ: PLTR", price:"約 $192",
   stooq:"pltr.us", cur:"usd", base:192.07, edate:"2026-11-02", elabel:"2026年11月上旬（予定）",
+  startLabel:"ウォッチ開始: 2026年10月7日（基準: 10/6終値 $192.07）",
   sector:["AIプラットフォーム","政府・国防","保有銘柄"],
   summary:"政府・国防と米国商業の両輪で急成長するAIデータ分析プラットフォーム。2026年Q2は売上19.35億ドル（前年比+93%）・GAAP純利益率55%・9四半期連続で市場予想超え。通期ガイダンスは81.5億ドル（+82%）へ過去最大の上方修正。業績は文句なしに強い。",
   points:[
@@ -456,6 +457,26 @@ const watchStocks = [
    "💸 税金: 利確時は譲渡益の約20%が課税される点も実質リターンに効く"
   ],
   risks:"高バリュエーション株は、成長鈍化のわずかな兆候だけで3〜4割の調整が起こりうる（過去にも複数回経験）。政府案件は予算・政権交代の影響を受けやすい。クロちゃんは金融アドバイザーではないので、売買の最終判断はだいちゃん自身でお願いします。"
+ },
+ {
+  name:"レノバ", ticker:"東証プライム 9519", price:"約 845円",
+  stooq:"9519.jp", cur:"jpy", base:845, edate:"2026-11-11", elabel:"2026年11月11日（予定・2Q）",
+  startLabel:"ウォッチ開始: 2026年10月12日（基準: 10/9終値 845円）",
+  sector:["再生可能エネルギー","太陽光・バイオマス","保有銘柄"],
+  summary:"太陽光・バイオマス・風力など再生可能エネルギー発電所を開発・運営する国内独立系の大手。2027年3月期1Qはバイオマス発電所の定期点検停止と軽米西ソーラーの運転停止が重なり、売上▲5.8%・営業利益▲68.4%（10.4億円）の大幅減益。株価は52週高値1,400円から845円まで下げ、52週安値616円からの戻り途中にある。",
+  points:[
+   "最大の論点は「1Qの大幅減益が一時要因（点検・停止）か、構造要因（売電単価・コスト）か」。会社は点検明けの下期回復を見込むが、その答え合わせが11月11日の2Q決算",
+   "アナリスト評価は分かれている: 8/26に日系大手が中立・目標1,040円へ引き下げた一方、9/30には別の日系大手が強気・目標1,150円へ引き上げ。いずれも現値845円より上",
+   "発電所ビジネスは借入が大きく金利上昇が逆風。一方で蓄電池事業・コーポレートPPAなどFIT後の新収益源が育つかが中期の分かれ目"
+  ],
+  checklist:[
+   "📅 11月11日の2Q決算: 点検明けで利益が戻っていれば「一時要因」の証明、戻っていなければ構造的な悪化を疑うタイミング",
+   "📏 期限を切る: 「次の決算まで」「年内まで」など見極めの期限を先に決めると、ずるずる塩漬けになるのを防げる",
+   "🧩 分割損切り: 一度に全部でなく「半分だけ売って身軽になる」のも有効。残りは回復シナリオに賭けつつリスクを半減できる",
+   "💸 損出しの税効果: 同じ年に利益確定した銘柄（米国株の利確など）があるなら、損失を確定させると譲渡益と相殺されて税金が戻る。12月末までに行う必要がある点に注意",
+   "⚖️ 機会費用: 「この資金を今の有望株に移したら？」と比べるのが塩漬け回避のコツ。戻るのを待つのも、乗り換えるのも、どちらも立派な判断"
+  ],
+  risks:"再エネ事業は政策（FIT/FIP制度・入札価格）と金利に業績が左右されやすく、自力でコントロールできない変数が多い。発電所の稼働トラブルは今回のように四半期単位で利益を大きく揺らす。52週安値616円を割る展開になった場合の下値目処は立てにくい。クロちゃんは金融アドバイザーではないので、損切りの最終判断はだいちゃん自身でお願いします。"
  }
 ];
 
@@ -474,7 +495,7 @@ function watchCard(s){
     </div>
     <div class="body">
       <div class="sec"><p style="color:var(--text);font-weight:600;">${s.summary}</p></div>
-      <div class="sec"><p style="font-size:.8rem;color:var(--sub);">📅 次回決算: ${s.elabel}${earningsSoon(s)?` <b style="color:var(--red)">⚠ 決算接近 — 発表前後は値動きが荒れやすいので注意</b>`:""}　／　ウォッチ開始: 2026年10月7日（基準: 10/6終値 $192.07）</p></div>
+      <div class="sec"><p style="font-size:.8rem;color:var(--sub);">📅 次回決算: ${s.elabel}${earningsSoon(s)?` <b style="color:var(--red)">⚠ 決算接近 — 発表前後は値動きが荒れやすいので注意</b>`:""}　／　${s.startLabel}</p></div>
       <div class="sec"><h4><span class="dot" style="background:var(--us)"></span>📈 過去1年の株価推移</h4>
         <div class="spark" id="spark-${s.stooq.replace(".","-")}">「🔄 最新株価に更新」を押すとチャートが表示されます</div></div>
       <div class="sec"><h4><span class="dot" style="background:var(--gold)"></span>📌 今の論点（2026年10月7日時点）</h4>
@@ -563,10 +584,12 @@ async function refreshPrices(){
       if(p == null) continue;
       const el = document.getElementById("price-"+s.stooq.replace(".","-"));
       if(!el) continue;
+      const isJp = s.cur === "jpy";
+      const str = isJp ? p.toLocaleString("ja-JP",{maximumFractionDigits:0})+"円" : "$"+p.toFixed(2);
       const chg = (p - s.base) / s.base * 100;
       const cs = (chg >= 0 ? "+" : "") + chg.toFixed(1);
       const cc = chg >= 0 ? "var(--green)" : "var(--red)";
-      el.innerHTML = `<div class="p">$${p.toFixed(2)}</div><div class="s" style="color:${cc};font-weight:700;">開始時比 ${cs}%</div>`;
+      el.innerHTML = `<div class="p">${str}</div><div class="s" style="color:${cc};font-weight:700;">開始時比 ${cs}%</div>`;
       const hist = data.history && data.history[s.stooq];
       const sp = document.getElementById("spark-"+s.stooq.replace(".","-"));
       if(sp && hist && hist.length > 2) sp.innerHTML = sparkSVG(hist);
